@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ФСП Платформа - Профиль</title>
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <header class="app-header">
+    <!-- Такое же как в index.html -->
+  </header>
+
+  <main class="main-content">
+    <div class="container profile-container">
+      <aside class="profile-sidebar">
+        <div class="profile-avatar">
+          <div class="avatar-image"></div>
+          <h3>Иван Петров</h3>
+          <p class="user-role">Спортсмен</p>
+          <p class="user-region">Москва</p>
+        </div>
+
+        <nav class="profile-menu">
+          <ul>
+            <li class="active"><a href="#">Мои данные</a></li>
+            <li><a href="#">Мои команды</a></li>
+            <li><a href="#">Мои соревнования</a></li>
+            <li><a href="#">Достижения</a></li>
+            <li><a href="#">Настройки</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <section class="profile-content">
+        <h2>Мой профиль</h2>
+        
+        <form class="profile-form">
+          <div class="form-group">
+            <label for="firstName">Имя</label>
+            <input type="text" id="firstName" value="Иван">
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Фамилия</label>
+            <input type="text" id="lastName" value="Петров">
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" value="ivan@example.com">
+          </div>
+
+          <div class="form-group">
+            <label for="region">Регион</label>
+            <select id="region">
+              <option value="moscow" selected>Москва</option>
+              <!-- Другие регионы -->
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+          </div>
+        </form>
+
+        <section class="achievements-section">
+          <h3>Последние достижения</h3>
+          <div class="achievements-grid">
+            <div class="achievement-card">
+              <div class="achievement-badge gold">1 место</div>
+              <h4>Алгоритмический марафон 2023</h4>
+              <p class="achievement-date">15 ноября 2023</p>
+            </div>
+            <!-- Другие достижения -->
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <!-- Такое же как в index.html -->
+  </footer>
+</body>
+</html>
