@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}ФСП Платформа - Главная{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <h2>Автоматизация спортивного программирования</h2>
+    <p>Платформа для организации соревнований, формирования команд и учета достижений</p>
+    <a href="{{ url_for('competitions') }}" class="btn btn-primary">Смотреть соревнования</a>
+  </section>
+
+  <section class="upcoming-events">
+    <h3>Ближайшие соревнования</h3>
+    <div class="events-grid">
+      {% for comp in competitions %}
+      <div class="event-card">
+        <div class="event-badge {{ comp.discipline }}">{{ comp.discipline|capitalize }}</div>
+        <h4>{{ comp.title }}</h4>
+        <p class="event-date">{{ comp.start_date.strftime('%d-%m-%Y') }} - {{ comp.end_date.strftime('%d-%m-%Y') }}</p>
+        <p class="event-description">{{ comp.description }}</p>
+        <a href="{{ url_for('competition_detail', id=comp.id) }}" class="btn btn-outline">Подробнее</a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
