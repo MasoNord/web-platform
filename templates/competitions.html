@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ФСП Платформа - Соревнования</title>
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <header class="app-header">
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header">
+        <h2>Соревнования</h2>
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="discipline">Дисциплина:</label>
+            <select id="discipline">
+              <option value="all">Все</option>
+              <option value="product">Продуктовое</option>
+              <option value="algorithm">Алгоритмическое</option>
+              <option value="security">Безопасность</option>
+              <option value="robotics">Робототехника</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="status">Статус:</label>
+            <select id="status">
+              <option value="upcoming">Предстоящие</option>
+              <option value="active">Текущие</option>
+              <option value="completed">Завершенные</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="competitions-list">
+        <div class="competition-card">
+          <div class="competition-header">
+            <span class="competition-badge product">Продуктовое</span>
+            <span class="competition-format">Командное</span>
+          </div>
+          <h3>Всероссийский чемпионат по продуктовому программированию</h3>
+          <div class="competition-meta">
+            <span class="date">21-28 апреля 2024</span>
+            <span class="region">Все регионы</span>
+          </div>
+          <p class="competition-description">
+            Крупнейшее соревнование по разработке программных продуктов. Команды из 3-5 человек.
+          </p>
+          <div class="competition-actions">
+            <a href="#" class="btn btn-primary">Зарегистрироваться</a>
+            <a href="#" class="btn btn-outline">Подробнее</a>
+          </div>
+        </div>
+
+        <!-- Еще карточки соревнований -->
+      </div>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <!-- Такое же как в index.html -->
+  </footer>
+</body>
+</html>
