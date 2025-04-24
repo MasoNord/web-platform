@@ -4,28 +4,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ФСП Платформа - Администрирование</title>
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Основные стили для фонового изображения */
+    body {
+      position: relative;
+      min-height: 100vh;
+    }
+    /* Стили для фонового изображения */
+    .bg-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Отправляем изображение на задний план */
+      background-image: url('https://img.freepik.com/free-vector/gradient-style-network-connection-background_23-2148879891.jpg?t=st=1745412670~exp=1745416270~hmac=e3366b487bad99346a1822cc4cc66467f1d41e818055fa0b91c09efde8f815d2&w=996'); /* ЗАМЕНИТЕ НА СВОЙ URL ИЗОБРАЖЕНИЯ */
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    /* Стили для основного контента */
+    .main-content {
+      position: relative;
+      z-index: 1; /* Поднимаем контент над фоном */
+      border-radius: 10px;
+      margin-top: 30px;
+      margin-bottom: 100px; /* Учитываем высоту футера */
+      padding: 20px;
+    }
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 768px) {
+      .main-content {
+        margin-top: 15px;
+        margin-bottom: 80px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header class="app-header">
+  <!-- Фоновое изображение -->
+  <div class="bg-image"></div>
+  <header class="app-header navbar navbar-dark bg-dark">
     <div class="container">
-      <div class="header-content">
-        <h1 class="logo">ФСП Платформа</h1>
-        <nav class="main-nav">
-          <ul>
-            <li><a href="index.html">Главная</a></li>
-            <li><a href="competitions.html">Соревнования</a></li>
-            <li><a href="profile.html">Профиль</a></li>
-            <li><a href="admin.html" class="active">Администрирование</a></li>
-          </ul>
-        </nav>
-        <div class="user-menu">
-          <span class="username">Администратор</span>
-          <div class="avatar admin"></div>
-        </div>
+      <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">ФСП Платформа</a>
+      <nav class="d-flex">
+        <ul class="navbar-nav flex-row">
+          <li class="nav-item mx-2">
+            <a class="nav-link" href="{{ url_for('index') }}">Главная</a>
+          </li>
+          <li class="nav-item mx-2">
+            <a class="nav-link" href="{{ url_for('competitions') }}">Соревнования</a>
+          </li>
+          <li class="nav-item mx-2">
+            <a class="nav-link active" href="{{ url_for('admin') }}">Администрирование</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('profile') }}" class="btn btn-outline-light">{{ current_user.username }}</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-light">Выход</a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-light">Вход</a>
+        <a href="{{ url_for('register') }}" class="btn btn-light">Регистрация</a>
+        {% endif %}
       </div>
     </div>
   </header>
@@ -33,7 +77,6 @@
   <main class="main-content">
     <div class="container admin-container">
       <h2>Панель администратора</h2>
-      
       <div class="admin-tabs">
         <div class="tab-buttons">
           <button class="tab-btn active" data-tab="competitions">Соревнования</button>
@@ -41,10 +84,11 @@
           <button class="tab-btn" data-tab="teams">Команды</button>
           <button class="tab-btn" data-tab="reports">Отчеты</button>
         </div>
-        
+
+        <!-- Соревнования -->
         <div class="tab-content active" id="competitions">
           <div class="admin-toolbar">
-            <button class="btn btn-primary" id="addCompetitionBtn">
+            <button class="btn btn-primary" id="addCompetitionBtn" data-bs-toggle="modal" data-bs-target="#addCompetitionModal">
               Добавить соревнование
             </button>
             <div class="search-box">
@@ -52,7 +96,6 @@
               <button class="search-btn">Найти</button>
             </div>
           </div>
-          
           <div class="admin-table-container">
             <table class="admin-table">
               <thead>
@@ -66,33 +109,25 @@
                 </tr>
               </thead>
               <tbody>
+                {% for competition in competitions %}
                 <tr>
-                  <td>Кубок России по продуктовому программированию</td>
-                  <td><span class="badge product">Продуктовое</span></td>
-                  <td>21-28 апр 2024</td>
-                  <td><span class="status upcoming">Запланировано</span></td>
-                  <td>24 команды</td>
+                  <td>{{ competition.name }}</td>
+                  <td><span class="badge product">{{ competition.discipline.name }}</span></td>
+                  <td>{{ competition.start_date }} - {{ competition.end_date }}</td>
+                  <td><span class="status {% if competition.status == 'upcoming' %}upcoming{% elif competition.status == 'active' %}active{% else %}completed{% endif %}">{{ competition.status }}</span></td>
+                  <td>{{ competition.participants_count }} участников</td>
                   <td>
-                    <button class="action-btn edit">Редактировать</button>
-                    <button class="action-btn delete">Удалить</button>
+                    <button class="action-btn edit" onclick="editCompetition({{ competition.id }})">Редактировать</button>
+                    <button class="action-btn delete" onclick="deleteCompetition({{ competition.id }})">Удалить</button>
                   </td>
                 </tr>
-                <tr>
-                  <td>Алгоритмический марафон</td>
-                  <td><span class="badge algorithm">Алгоритмы</span></td>
-                  <td>15 мая 2024</td>
-                  <td><span class="status active">Активно</span></td>
-                  <td>57 участников</td>
-                  <td>
-                    <button class="action-btn edit">Редактировать</button>
-                    <button class="action-btn delete">Удалить</button>
-                  </td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
-        
+
+        <!-- Пользователи -->
         <div class="tab-content" id="users">
           <div class="admin-toolbar">
             <div class="search-box">
@@ -109,7 +144,6 @@
               </select>
             </div>
           </div>
-          
           <div class="admin-table-container">
             <table class="admin-table">
               <thead>
@@ -123,33 +157,25 @@
                 </tr>
               </thead>
               <tbody>
+                {% for user in users %}
                 <tr>
-                  <td>Иванов Алексей</td>
-                  <td>alex@example.com</td>
-                  <td><span class="role admin">Администратор</span></td>
-                  <td>-</td>
-                  <td>12.01.2023</td>
+                  <td>{{ user.full_name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td><span class="role {% if user.role == 'admin' %}admin{% elif user.role == 'representative' %}representative{% else %}athlete{% endif %}">{{ user.role }}</span></td>
+                  <td>{{ user.region.name }}</td>
+                  <td>{{ user.created_at.strftime('%d.%m.%Y') }}</td>
                   <td>
-                    <button class="action-btn edit">Редактировать</button>
-                    <button class="action-btn delete">Удалить</button>
+                    <button class="action-btn edit" onclick="editUser({{ user.id }})">Редактировать</button>
+                    <button class="action-btn delete" onclick="deleteUser({{ user.id }})">Удалить</button>
                   </td>
                 </tr>
-                <tr>
-                  <td>Петрова Мария</td>
-                  <td>maria@example.com</td>
-                  <td><span class="role representative">Представитель</span></td>
-                  <td>Москва</td>
-                  <td>05.03.2023</td>
-                  <td>
-                    <button class="action-btn edit">Редактировать</button>
-                    <button class="action-btn delete">Удалить</button>
-                  </td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
-        
+
+        <!-- Команды -->
         <div class="tab-content" id="teams">
           <div class="admin-toolbar">
             <div class="search-box">
@@ -160,12 +186,12 @@
               <label for="teamCompetition">Соревнование:</label>
               <select id="teamCompetition">
                 <option value="all">Все</option>
-                <option value="1">Кубок России</option>
-                <option value="2">Алгоритмический марафон</option>
+                {% for competition in competitions %}
+                <option value="{{ competition.id }}">{{ competition.name }}</option>
+                {% endfor %}
               </select>
             </div>
           </div>
-          
           <div class="admin-table-container">
             <table class="admin-table">
               <thead>
@@ -179,22 +205,25 @@
                 </tr>
               </thead>
               <tbody>
+                {% for team in teams %}
                 <tr>
-                  <td>Код Мастера</td>
-                  <td>Иванов Алексей</td>
-                  <td>Кубок России</td>
-                  <td>5 участников</td>
-                  <td><span class="status approved">Подтверждена</span></td>
+                  <td>{{ team.name }}</td>
+                  <td>{{ team.captain.full_name }}</td>
+                  <td>{{ team.competition.name }}</td>
+                  <td>{{ team.members_count }} участников</td>
+                  <td><span class="status {% if team.status == 'approved' %}approved{% else %}pending{% endif %}">{{ team.status }}</span></td>
                   <td>
-                    <button class="action-btn view">Просмотр</button>
-                    <button class="action-btn edit">Редактировать</button>
+                    <button class="action-btn view" onclick="viewTeam({{ team.id }})">Просмотр</button>
+                    <button class="action-btn edit" onclick="editTeam({{ team.id }})">Редактировать</button>
                   </td>
                 </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
-        
+
+        <!-- Отчеты -->
         <div class="tab-content" id="reports">
           <div class="report-cards">
             <div class="report-card">
@@ -204,7 +233,6 @@
               </div>
               <button class="btn btn-outline download-btn">Скачать отчет</button>
             </div>
-            
             <div class="report-card">
               <h3>Активность по регионам</h3>
               <div class="report-content">
@@ -219,85 +247,70 @@
   </main>
 
   <!-- Модальное окно добавления соревнования -->
-  <div class="modal" id="addCompetitionModal">
-    <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <h3>Добавить новое соревнование</h3>
-      
-      <form id="competitionForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="compName">Название*</label>
-            <input type="text" id="compName" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="compDiscipline">Дисциплина*</label>
-            <select id="compDiscipline" required>
-              <option value="">Выберите дисциплину</option>
-              <option value="product">Продуктовое программирование</option>
-              <option value="algorithm">Алгоритмическое программирование</option>
-              <option value="security">Программирование безопасности</option>
-              <option value="robotics">Программирование робототехники</option>
-            </select>
-          </div>
+  <div class="modal fade" id="addCompetitionModal" tabindex="-1" aria-labelledby="addCompetitionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCompetitionModalLabel">Добавить новое соревнование</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="compStartDate">Дата начала*</label>
-            <input type="date" id="compStartDate" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="compEndDate">Дата окончания*</label>
-            <input type="date" id="compEndDate" required>
-          </div>
+        <div class="modal-body">
+          <form id="competitionForm" method="POST" action="{{ url_for('create_competition') }}">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="compName">Название*</label>
+                <input type="text" id="compName" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="compDiscipline">Дисциплина*</label>
+                <select id="compDiscipline" name="discipline_id" required>
+                  <option value="">Выберите дисциплину</option>
+                  {% for discipline in disciplines %}
+                  <option value="{{ discipline.id }}">{{ discipline.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="compStartDate">Дата начала*</label>
+                <input type="date" id="compStartDate" name="start_date" required>
+              </div>
+              <div class="form-group">
+                <label for="compEndDate">Дата окончания*</label>
+                <input type="date" id="compEndDate" name="end_date" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="compDescription">Описание</label>
+              <textarea id="compDescription" name="description" rows="4"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="compFormat">Формат*</label>
+                <select id="compFormat" name="format" required>
+                  <option value="open">Открытое</option>
+                  <option value="regional">Региональное</option>
+                  <option value="national">Всероссийское</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="compRegion">Регион (если региональное)</label>
+                <select id="compRegion" name="region_id">
+                  <option value="">Не указано</option>
+                  {% for region in regions %}
+                  <option value="{{ region.id }}">{{ region.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Создать</button>
+          </form>
         </div>
-        
-        <div class="form-group">
-          <label for="compDescription">Описание</label>
-          <textarea id="compDescription" rows="4"></textarea>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="compFormat">Формат*</label>
-            <select id="compFormat" required>
-              <option value="open">Открытое</option>
-              <option value="regional">Региональное</option>
-              <option value="national">Всероссийское</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="compRegion">Регион (если региональное)</label>
-            <select id="compRegion">
-              <option value="">Не указано</option>
-              <option value="moscow">Москва</option>
-              <option value="spb">Санкт-Петербург</option>
-              <!-- Другие регионы -->
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Сохранить</button>
-          <button type="button" class="btn btn-outline cancel-btn">Отмена</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
-  <footer class="main-footer">
-    <div class="container">
-      <p>© 2023 Федерация спортивного программирования. Все права защищены.</p>
-      <p>Контакты: <a href="mailto:info@fsp.ru">info@fsp.ru</a> | <a href="tel:+78001234567">8-800-123-45-67</a></p>
-    </div>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="js/admin.js"></script>
-  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

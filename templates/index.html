@@ -1,26 +1,133 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Главная - ФСП Платформа</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    /* Основные стили для фонового изображения */
+    body {
+      position: relative;
+      min-height: 100vh;
+    }
 
-{% block title %}ФСП Платформа - Главная{% endblock %}
+    /* Стили для фонового изображения */
+    .bg-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Отправляем изображение на задний план */
+      background-image: url('https://img.freepik.com/free-vector/gradient-style-network-connection-background_23-2148879891.jpg?t=st=1745412670~exp=1745416270~hmac=e3366b487bad99346a1822cc4cc66467f1d41e818055fa0b91c09efde8f815d2&w=996'); /* ЗАМЕНИТЕ НА СВОЙ URL ИЗОБРАЖЕНИЯ */
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
 
-{% block content %}
-  <section class="hero">
-    <h2>Автоматизация спортивного программирования</h2>
-    <p>Платформа для организации соревнований, формирования команд и учета достижений</p>
-    <a href="{{ url_for('competitions') }}" class="btn btn-primary">Смотреть соревнования</a>
-  </section>
+    /* Стили для основного контента */
+    .main-content {
+      position: relative;
+      z-index: 1; /* Поднимаем контент над фоном */
+      border-radius: 10px;
+      margin-top: 30px;
+      margin-bottom: 100px; /* Учитываем высоту футера */
+      padding: 20px;
+    }
 
-  <section class="upcoming-events">
-    <h3>Ближайшие соревнования</h3>
-    <div class="events-grid">
-      {% for comp in competitions %}
-      <div class="event-card">
-        <div class="event-badge {{ comp.discipline }}">{{ comp.discipline|capitalize }}</div>
-        <h4>{{ comp.title }}</h4>
-        <p class="event-date">{{ comp.start_date.strftime('%d-%m-%Y') }} - {{ comp.end_date.strftime('%d-%m-%Y') }}</p>
-        <p class="event-description">{{ comp.description }}</p>
-        <a href="{{ url_for('competition_detail', id=comp.id) }}" class="btn btn-outline">Подробнее</a>
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 768px) {
+      .main-content {
+        margin-top: 15px;
+        margin-bottom: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Фоновое изображение -->
+  <div class="bg-image"></div>
+
+  <header class="app-header navbar navbar-dark bg-dark" style="height: 80px;">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">ФСП Платформа</a>
+      <nav class="d-flex">
+        <ul class="navbar-nav flex-row">
+          <li class="nav-item mx-2">
+            <a class="nav-link active" href="{{ url_for('index') }}">Главная</a>
+          </li>
+          <li class="nav-item mx-2">
+            <a class="nav-link" href="{{ url_for('competitions') }}">Соревнования</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <a href="{{ url_for('profile') }}" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-person"></i> Профиль
+        </a>
       </div>
-      {% endfor %}
     </div>
-  </section>
-{% endblock %}
+  </header>
+
+  <main class="main-content py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto text-center mb-5 bg-white">
+          <h1 class="display-4 mb-3">Федерация спортивного программирования</h1>
+          <p class="lead">Платформа для организации и участия в соревнованиях по программированию</p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-trophy fs-1 text-primary mb-3"></i>
+              <h3 class="h4">Соревнования</h3>
+              <p>Участвуйте в турнирах и повышайте свой рейтинг</p>
+              <a href="{{ url_for('competitions') }}" class="btn btn-outline-primary">Посмотреть</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-people fs-1 text-primary mb-3"></i>
+              <h3 class="h4">Команды</h3>
+              <p>Создавайте команды и участвуйте вместе</p>
+              <a href="{{ url_for('my_teams') }}" class="btn btn-outline-primary">Мои команды</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-award fs-1 text-primary mb-3"></i>
+              <h3 class="h4">Достижения</h3>
+              <p>Отслеживайте ваши успехи и прогресс</p>
+              <a href="{{ url_for('achievements') }}" class="btn btn-outline-primary">Мои достижения</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="fixed-bottom main-footer bg-dark text-white py-4">
+    <div class="container text-center">
+      <p class="mb-1">© 2023 Федерация спортивного программирования. Все права защищены.</p>
+      <p class="mb-0">
+        Контакты:
+        <a href="mailto:info@fsp.ru" class="text-info">info@fsp.ru</a> |
+        <a href="tel:+78001234567" class="text-info">8-800-123-45-67</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
