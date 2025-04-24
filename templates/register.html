@@ -1,45 +1,112 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ФСП Платформа - Регистрация</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Регистрация</h2>
+        <p>Создайте учетную запись</p>
+      </div>
 
-{% block content %}
-<div class="auth-container">
-    <h2>Регистрация</h2>
+      <!-- Форма регистрации -->
+      <form class="auth-form" id="registerForm" method="POST" action="{{ url_for('register') }}">
+        {{ form.hidden_tag() if form }}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
-                </div>
+        <!-- Имя и Фамилия -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regFirstName">Имя</label>
+            <input type="text" id="regFirstName" name="first_name" placeholder="Иван" required>
+          </div>
+
+          <div class="form-group">
+            <label for="regLastName">Фамилия</label>
+            <input type="text" id="regLastName" name="last_name" placeholder="Петров" required>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" name="email" placeholder="example@mail.com" required>
+        </div>
+
+        <!-- Пароль -->
+        <div class="form-group">
+          <label for="regPassword">Пароль</label>
+          <input type="password" id="regPassword" name="password" placeholder="Не менее 8 символов" required>
+        </div>
+
+        <!-- Подтверждение пароля -->
+        <div class="form-group">
+          <label for="regConfirmPassword">Подтвердите пароль</label>
+          <input type="password" id="regConfirmPassword" name="confirm_password" placeholder="Повторите пароль" required>
+        </div>
+
+        <!-- Роль -->
+        <div class="form-group">
+          <label for="regRole">Роль</label>
+          <select id="regRole" name="role" required>
+            <option value="">Выберите роль</option>
+            <option value="athlete">Спортсмен</option>
+            <option value="representative">Региональный представитель</option>
+            <option value="admin">Администратор</option>
+          </select>
+        </div>
+
+        <!-- Регион (отображается при выборе роли "Региональный представитель") -->
+        <div class="form-group" id="regionField" style="display: none;">
+          <label for="regRegion">Регион</label>
+          <select id="regRegion" name="region">
+            <option value="">Выберите регион</option>
+            {% for region in regions %}
+            <option value="{{ region.id }}">{{ region.name }}</option>
             {% endfor %}
+          </select>
+        </div>
+
+        <!-- Согласие с правилами -->
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="regAgreement" name="agreement" required>
+          <label for="regAgreement">Я согласен с <a href="#">правилами платформы</a> и <a href="#">политикой конфиденциальности</a></label>
+        </div>
+
+        <!-- Кнопка регистрации -->
+        <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+
+        <!-- Ссылка на вход -->
+        <div class="auth-footer">
+          Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a>
+        </div>
+      </form>
+
+      <!-- Отображение флеш-сообщений -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
         {% endif %}
-    {% endwith %}
-
-    <form method="POST" action="{{ url_for('register') }}">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-
-        <div class="form-group">
-            <label for="password">Пароль</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-
-        <div class="form-group">
-            <label for="first_name">Имя</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="last_name">Фамилия</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-    </form>
-
-    <div class="mt-3">
-        Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a>
+      {% endwith %}
     </div>
-</div>
-{% endblock %}
+
+    <!-- Логотип и название платформы -->
+    <div class="auth-logo">
+      <img src="{{ url_for('static', filename='images/ie2r54gnztaos04378al8wxyqbt8hiwe.svg') }}" alt="ФСП Платформа">
+      <h1>Федерация спортивного программирования</h1>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

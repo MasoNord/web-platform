@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ФСП Платформа - Профиль</title>
+  <title>ФСП Платформа - Достижения</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
   <style>
     /* Основные стили для фонового изображения */
     body {
@@ -37,6 +36,7 @@
       margin-top: 30px;
       margin-bottom: 100px; /* Учитываем высоту футера */
       padding: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
 
     /* Адаптация для мобильных устройств */
@@ -50,7 +50,6 @@
 </head>
 <body>
   <div class="bg-image"></div>
-
   <header class="app-header navbar navbar-dark bg-dark" style="height: 80px;">
     <div class="container">
       <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">ФСП Платформа</a>
@@ -85,16 +84,16 @@
               <div class="avatar-image bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
                 <i class="bi bi-person-fill text-white" style="font-size: 3rem;"></i>
               </div>
-              <h3 class="h5 mt-2">{{ current_user.full_name }}</h3>
+              <h3 class="h5 mt-2">{{ current_user.username }}</h3>
               <p class="text-muted small">{{ current_user.role }}</p>
               <p class="text-muted small"><i class="bi bi-geo-alt"></i> {{ current_user.region.name }}</p>
             </div>
 
             <nav class="profile-menu nav flex-column">
-              <a class="nav-link active" href="{{ url_for('profile') }}"><i class="bi bi-person me-2"></i>Мои данные</a>
+              <a class="nav-link" href="{{ url_for('profile') }}"><i class="bi bi-person me-2"></i>Мои данные</a>
               <a class="nav-link" href="{{ url_for('my_teams') }}"><i class="bi bi-people me-2"></i>Мои команды</a>
               <a class="nav-link" href="{{ url_for('my_competitions') }}"><i class="bi bi-trophy me-2"></i>Мои соревнования</a>
-              <a class="nav-link" href="{{ url_for('achievements') }}"><i class="bi bi-award me-2"></i>Достижения</a>
+              <a class="nav-link active" href="{{ url_for('achievements') }}"><i class="bi bi-award me-2"></i>Достижения</a>
               <a class="nav-link" href="{{ url_for('settings') }}"><i class="bi bi-gear me-2"></i>Настройки</a>
             </nav>
           </div>
@@ -103,64 +102,82 @@
         <section class="col-md-9">
           <div class="card">
             <div class="card-header bg-white">
-              <h2 class="h4 mb-0">Мой профиль</h2>
+              <h2 class="h4 mb-0">Мои достижения</h2>
             </div>
 
             <div class="card-body">
-              <form class="profile-form" method="POST" action="{{ url_for('update_profile') }}">
-                {{ form.hidden_tag() if form }}
-
-                <div class="row mb-3">
-                  <div class="col-md-6">
-                    <label for="firstName" class="form-label">Имя</label>
-                    <input type="text" class="form-control" id="firstName" name="first_name" value="{{ current_user.first_name }}" required>
+              <div class="stats-overview mb-5">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <div class="card text-center">
+                      <div class="card-body">
+                        <h3 class="h6">Всего соревнований</h3>
+                        <p class="display-6 text-primary">{{ stats.total_competitions }}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div class="col-md-6">
-                    <label for="lastName" class="form-label">Фамилия</label>
-                    <input type="text" class="form-control" id="lastName" name="last_name" value="{{ current_user.last_name }}" required>
+                  <div class="col-md-4">
+                    <div class="card text-center">
+                      <div class="card-body">
+                        <h3 class="h6">Побед</h3>
+                        <p class="display-6 text-primary">{{ stats.wins }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card text-center">
+                      <div class="card-body">
+                        <h3 class="h6">Призовых мест</h3>
+                        <p class="display-6 text-primary">{{ stats.podiums }}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div class="mb-3">
-                  <label for="email" class="form-label">Email</label>
-                  <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
-                </div>
-
-                <div class="mb-3">
-                  <label for="region" class="form-label">Регион</label>
-                  <select class="form-select" id="region" name="region_id">
-                    {% for region in regions %}
-                    <option value="{{ region.id }}" {% if region.id == current_user.region_id %}selected{% endif %}>{{ region.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-
-                <div class="form-actions mt-4">
-                  <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-                </div>
-              </form>
-
-              <section class="achievements-section mt-5">
-                <h3 class="h5 mb-3">Последние достижения</h3>
+              <div class="achievements-grid">
                 <div class="row g-3">
                   {% for achievement in achievements %}
                   <div class="col-md-6">
-                    <div class="card">
+                    <div class="card border-{{ achievement.color_class }}">
                       <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                           <div>
-                            <span class="badge bg-warning text-dark mb-2">{{ achievement.place }}</span>
-                            <h4 class="h6 mb-1">{{ achievement.title }}</h4>
-                            <p class="text-muted small mb-0">{{ achievement.date.strftime('%d.%m.%Y') }}</p>
+                            <span class="badge bg-{{ achievement.color_class }} text-{{ achievement.text_color }} mb-2">{{ achievement.place }}</span>
+                            <h4 class="h5">{{ achievement.title }}</h4>
+                            <p class="text-muted small mb-2">{{ achievement.date.strftime('%d-%m-%Y') }}</p>
+                            <p class="mb-0">{{ achievement.description }}</p>
                           </div>
-                          <i class="bi bi-trophy-fill text-warning fs-4"></i>
+                          <i class="bi bi-{{ achievement.icon }} text-{{ achievement.color_class }} fs-3"></i>
                         </div>
                       </div>
                     </div>
                   </div>
                   {% endfor %}
                 </div>
-              </section>
+              </div>
+
+              <div class="certificates-section mt-5">
+                <h3 class="h5 mb-3">Сертификаты</h3>
+                <div class="list-group">
+                  {% for certificate in certificates %}
+                  <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex align-items-center">
+                        <i class="bi bi-file-earmark-text-fill text-primary fs-4 me-3"></i>
+                        <div>
+                          <h5 class="mb-1">{{ certificate.title }}</h5>
+                          <p class="mb-0 small text-muted">{{ certificate.type }}</p>
+                        </div>
+                      </div>
+                      <a href="{{ certificate.download_url }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-download"></i> Скачать
+                      </a>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -172,8 +189,8 @@
     <div class="container text-center">
       <p class="mb-1">© 2023 Федерация спортивного программирования. Все права защищены.</p>
       <p class="mb-0">
-        Контакты:
-        <a href="mailto:info@fsp.ru" class="text-info">info@fsp.ru</a> |
+        Контакты: 
+        <a href="mailto:info@fsp.ru" class="text-info">info@fsp.ru</a> | 
         <a href="tel:+78001234567" class="text-info">8-800-123-45-67</a>
       </p>
     </div>

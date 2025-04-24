@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ФСП Платформа - Мои команды</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Основные стили для фонового изображения */
+    body {
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Стили для фонового изображения */
+    .bg-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Отправляем изображение на задний план */
+      background-image: url('https://img.freepik.com/free-vector/gradient-style-network-connection-background_23-2148879891.jpg?t=st=1745412670~exp=1745416270~hmac=e3366b487bad99346a1822cc4cc66467f1d41e818055fa0b91c09efde8f815d2&w=996'); /* ЗАМЕНИТЕ НА СВОЙ URL ИЗОБРАЖЕНИЯ */
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    /* Стили для основного контента */
+    .main-content {
+      position: relative;
+      z-index: 1; /* Поднимаем контент над фоном */
+      border-radius: 10px;
+      margin-top: 30px;
+      margin-bottom: 100px; /* Учитываем высоту футера */
+      padding: 20px;
+    }
+
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 768px) {
+      .main-content {
+        margin-top: 15px;
+        margin-bottom: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-image"></div>
+
+<header class="app-header navbar navbar-dark bg-dark" style="height: 80px;">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">ФСП Платформа</a>
+    <nav class="d-flex">
+      <ul class="navbar-nav flex-row">
+        <li class="nav-item mx-2">
+          <a class="nav-link" href="{{ url_for('index') }}">Главная</a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link" href="{{ url_for('competitions') }}">Соревнования</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="user-menu">
+      <a href="{{ url_for('profile') }}" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-person"></i> Профиль
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="main-content py-4">
+  <div class="container">
+    <div class="row">
+      <!-- Боковая панель -->
+      <aside class="col-md-3 mb-4">
+        <div class="profile-sidebar card p-3">
+          <div class="profile-avatar text-center mb-3">
+            <div class="avatar-image bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+              <i class="bi bi-person-fill text-white" style="font-size: 3rem;"></i>
+            </div>
+            <h3 class="h5 mt-2">{{ current_user.username }}</h3>
+            <p class="text-muted small">{{ current_user.role }}</p>
+            <p class="text-muted small"><i class="bi bi-geo-alt"></i> {{ current_user.region.name }}</p>
+          </div>
+
+          <nav class="profile-menu nav flex-column">
+            <a class="nav-link" href="{{ url_for('profile') }}"><i class="bi bi-person me-2"></i>Мои данные</a>
+            <a class="nav-link active" href="{{ url_for('my_teams') }}"><i class="bi bi-people me-2"></i>Мои команды</a>
+            <a class="nav-link" href="{{ url_for('my_competitions') }}"><i class="bi bi-trophy me-2"></i>Мои соревнования</a>
+            <a class="nav-link" href="{{ url_for('achievements') }}"><i class="bi bi-award me-2"></i>Достижения</a>
+            <a class="nav-link" href="{{ url_for('settings') }}"><i class="bi bi-gear me-2"></i>Настройки</a>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Основной контент -->
+      <section class="col-md-9">
+        <div class="card">
+          <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h2 class="h4 mb-0">Мои команды</h2>
+              <a href="{{ url_for('create_team') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus"></i> Создать команду
+              </a>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Список команд -->
+            <div class="row g-3">
+              {% for team in teams %}
+              <div class="col-md-6">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h3 class="h5 mb-0">{{ team.name }}</h3>
+                      {% if team.captain_id == current_user.user_id %}
+                      <span class="badge bg-primary">Капитан</span>
+                      {% else %}
+                      <span class="badge bg-secondary">Участник</span>
+                      {% endif %}
+                    </div>
+                    <p class="text-muted small">
+                      <i class="bi bi-people"></i> {{ team.members|length }} участников
+                    </p>
+                    <p class="text-muted small">
+                      <i class="bi bi-calendar"></i> Создана: {{ team.created_at.strftime('%d.%m.%Y') }}
+                    </p>
+                    <div class="d-grid gap-2 mt-3">
+                      {% if team.captain_id == current_user.user_id %}
+                      <a href="{{ url_for('manage_team', team_id=team.team_id) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-gear"></i> Управление
+                      </a>
+                      {% endif %}
+                      <a href="{{ url_for('leave_team', team_id=team.team_id) }}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-x-circle"></i> Покинуть
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Приглашения в команды -->
+            <div class="invitations-section mt-5">
+              <h3 class="h5 mb-3">Приглашения в команды</h3>
+              {% for invitation in invitations %}
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h4 class="h6 mb-1">{{ invitation.team_name }}</h4>
+                      <p class="text-muted small mb-0">Приглашение от: {{ invitation.inviter_name }}</p>
+                    </div>
+                    <div class="btn-group">
+                      <a href="{{ url_for('accept_invitation', invitation_id=invitation.invitation_id) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-check"></i> Принять
+                      </a>
+                      <a href="{{ url_for('reject_invitation', invitation_id=invitation.invitation_id) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-x"></i> Отклонить
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="fixed-bottom main-footer bg-dark text-white py-4">
+  <div class="container text-center">
+    <p class="mb-1">© 2023 Федерация спортивного программирования. Все права защищены.</p>
+    <p class="mb-0">
+      Контакты:
+      <a href="mailto:info@fsp.ru" class="text-info">info@fsp.ru</a> |
+      <a href="tel:+78001234567" class="text-info">8-800-123-45-67</a>
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
